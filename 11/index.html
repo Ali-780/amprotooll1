@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة التراخيص - AmPro</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- التنسيقات الخاصة -->
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        * {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .login-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+        }
+        
+        .security-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .main-container {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: none; /* مخفي في البداية */
+        }
+        
+        .navbar-custom {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* بقية التنسيقات كما هي... */
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- شاشة الدخول -->
+    <div id="loginScreen">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="text-center mb-4">
+                    <div class="mb-3">
+                        <i class="fas fa-lock fa-3x" style="color: #3498db;"></i>
+                    </div>
+                    <h2 class="fw-bold">نظام إدارة التراخيص</h2>
+                    <p class="text-muted">AmPro License Management System</p>
+                </div>
+                
+                <div class="security-box mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0"><i class="fas fa-shield-alt me-2"></i> الأمان</h6>
+                        <span id="attemptsLeft" class="badge bg-success">5</span>
+                    </div>
+                    
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div id="attemptsProgress" class="progress-bar bg-success" style="width: 100%"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>المحاولات المتبقية</span>
+                        <span>الحماية نشطة</span>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold">كلمة المرور</label>
+                    <div class="input-group">
+                        <input type="password" 
+                               id="passwordInput" 
+                               class="form-control form-control-lg" 
+                               placeholder="أدخل كلمة المرور"
+                               autocomplete="off"
+                               autofocus>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div>
+                            <small class="text-muted">تلميح:</small>
+                            <span id="hint" class="hint-hidden mx-1">••••••</span>
+                            <button type="button" class="btn btn-sm btn-link p-0" onclick="toggleHint()">
+                                <small>إظهار</small>
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-link p-0" onclick="showForgotPassword()">
+                            <small>نسيت كلمة المرور؟</small>
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-lg w-100 mb-3" onclick="login()">
+                    <i class="fas fa-sign-in-alt me-2"></i> دخول
+                </button>
+                
+                <!-- زر للاختبار فقط - احذفه بعد التأكد -->
+                <button class="btn btn-outline-secondary btn-sm w-100" onclick="testLogin()">
+                    <i class="fas fa-bug me-1"></i> اختبار الدخول
+                </button>
+                
+                <div class="text-center mt-4">
+                    <small class="text-muted d-block">
+                        <i class="fas fa-info-circle me-1"></i> الجلسة تنتهي بعد <span id="sessionTimer">30:00</span> دقيقة
+                    </small>
+                    <small class="text-muted mt-2 d-block">
+                        كلمة المرور للاختبار: <code>780431</code>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div id="mainContent" class="d-none">
+        <!-- شريط التنقل -->
+        <nav class="navbar navbar-dark bg-primary fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-user-cog"></i> إدارة التراخيص
+                    <small class="ms-2">| التحكم الكامل</small>
+                </a>
+                <div class="d-flex">
+                    <span class="badge bg-light text-dark me-2">
+                        <i class="fas fa-users"></i> <span id="activeCount">0</span> نشط
+                    </span>
+                    <button class="btn btn-light btn-sm me-2" onclick="refreshAll()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> خروج
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- المحتوى -->
+        <div class="container mt-5 pt-4">
+            <!-- الإحصائيات -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <h5><i class="fas fa-database text-primary"></i> قاعدة البيانات 1</h5>
+                            <div class="stat-number" id="stat1">0</div>
+                            <p class="text-muted">عدد المستخدمين</p>
+                            <button class="btn btn-primary btn-sm" onclick="updateStat(1)">
+                                <i class="fas fa-redo"></i> تحديث
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <h5><i class="fas fa-database text-success"></i> قاعدة البيانات 2</h5>
+                            <div class="stat-number" id="stat2">0</div>
+                            <p class="text-muted">عدد المستخدمين</p>
+                            <button class="btn btn-success btn-sm" onclick="updateStat(2)">
+                                <i class="fas fa-redo"></i> تحديث
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- إنشاء ترخيص جديد -->
+            <div class="card mb-4 create-card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle"></i> إنشاء ترخيص جديد</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <input type="text" id="licenseKey" class="form-control" placeholder="🔑 مفتاح الترخيص" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="text" id="userName" class="form-control" placeholder="👤 اسم المستخدم" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="date" id="expiryDate" class="form-control" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="text" id="licenseHWID" class="form-control" placeholder="💻 HWID (اختياري)">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <textarea id="licenseNotes" class="form-control" placeholder="📝 ملاحظات إضافية (اختياري)" rows="2"></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-success btn-lg" onclick="createLicense()">
+                            <i class="fas fa-save"></i> إنشاء الترخيص
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- البحث والتصفية -->
+            <div class="card mb-4 search-card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <div class="input-group">
+                                <input type="text" id="searchInput" class="form-control" 
+                                       placeholder="🔍 ابحث بالمفتاح أو اسم المستخدم..." 
+                                       onkeyup="searchLicenses()">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <select id="filterStatus" class="form-select" onchange="filterLicenses()">
+                                <option value="all">جميع الحالات</option>
+                                <option value="active">النشطة فقط</option>
+                                <option value="used">المستخدمة فقط</option>
+                                <option value="expired">المنتهية فقط</option>
+                                <option value="linked">المرتبطة بجهاز</option>
+                                <option value="unlinked">غير المرتبطة</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قائمة التراخيص -->
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> جميع التراخيص
+                            <span class="badge bg-light text-dark ms-2" id="totalLicenses">0</span>
+                        </h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-light me-2" onclick="exportToCSV()">
+                                <i class="fas fa-download"></i> تصدير
+                            </button>
+                            <button class="btn btn-sm btn-outline-light" onclick="toggleSelectMode()">
+                                <i class="fas fa-check-double"></i> تحديد متعدد
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="loading" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">جاري التحميل...</span>
+                        </div>
+                        <p class="mt-2">جاري تحميل التراخيص...</p>
+                    </div>
+
+                    <div id="licensesList" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- معلومات الجلسة -->
+        <div class="session-info fixed-bottom text-center bg-dark text-white py-1">
+            <small>
+                <i class="fas fa-user-clock"></i>
+                الجلسة تنتهي في: <span id="sessionTimer">30:00</span>
+                | التراخيص: <span id="licenseCount">0</span> | النشطة: <span id="activeUsers">0</span>
+            </small>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل البيانات -->
+    <div class="modal fade" id="editLicenseModal" tabindex="-1" aria-labelledby="editLicenseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="editLicenseModalLabel">
+                        <i class="fas fa-edit"></i> تعديل بيانات الترخيص
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editLicenseForm">
+                        <input type="hidden" id="editLicenseKey">
+                        
+                        <div class="mb-3">
+                            <label for="editUserName" class="form-label">اسم المستخدم</label>
+                            <input type="text" class="form-control" id="editUserName" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editExpiryDate" class="form-label">تاريخ الانتهاء</label>
+                            <input type="date" class="form-control" id="editExpiryDate" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editHWID" class="form-label">رقم الجهاز (HWID)</label>
+                            <input type="text" class="form-control" id="editHWID" placeholder="اترك فارغاً لحذف HWID">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editNotes" class="form-label">ملاحظات</label>
+                            <textarea class="form-control" id="editNotes" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">حالة الترخيص</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="editUsed" id="editActive" value="false" checked>
+                                    <label class="form-check-label" for="editActive">نشط</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="editUsed" id="editUsed" value="true">
+                                    <label class="form-check-label" for="editUsed">مستخدم</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="saveLicenseEdit()">
+                        <i class="fas fa-save"></i> حفظ التعديلات
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة نسيت كلمة المرور -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-question-circle"></i> استعادة الدخول</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>للدخول للنظام، استخدم كلمة المرور:</p>
+                    <div class="alert alert-primary text-center">
+                        <h3 class="mb-0">780431</h3>
+                        <small class="text-muted">Password: 780431</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مكتبات JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

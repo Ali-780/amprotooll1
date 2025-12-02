@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>اختبار Firebase</title>
+</head>
+<body>
+    <h1>اختبار اتصال Firebase</h1>
+    <button onclick="testFirebase()">اختبار الاتصال</button>
+    <div id="result"></div>
+    
+    <script>
+    async function testFirebase() {
+        const url = "https://amprousers-default-rtdb.firebaseio.com/license_keys.json?auth=1hI1zkAiGvtkQEXwlbV8bm63qgtcIiythBTK5Z3I";
+        
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            document.getElementById('result').innerHTML = `
+                <h3>✅ الاتصال ناجح</h3>
+                <p>عدد التراخيص: ${Object.keys(data || {}).length}</p>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            
+            console.log('Firebase Data:', data);
+        } catch (error) {
+            document.getElementById('result').innerHTML = `
+                <h3>❌ فشل الاتصال</h3>
+                <p>${error.message}</p>
+            `;
+            console.error('Firebase Error:', error);
+        }
+    }
+    
+    // تشغيل الاختبار تلقائياً
+    window.onload = testFirebase;
+    </script>
+</body>
+</html>
