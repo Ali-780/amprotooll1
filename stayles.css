@@ -1,0 +1,207 @@
+/* إضافة أنماط أزرار الإدارة في القائمة */
+
+/* بطاقة الترخيص مع الأزرار */
+.license-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--success-color);
+    transition: all 0.3s;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    position: relative;
+}
+
+.license-card.used {
+    border-left-color: var(--danger-color);
+    opacity: 0.9;
+}
+
+.license-card.expired {
+    border-left-color: var(--warning-color);
+}
+
+.license-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* قسم المعلومات */
+.license-info {
+    flex: 1;
+}
+
+.license-info h6 {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--dark-color);
+}
+
+.license-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* قسم الأزرار */
+.license-actions {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+/* تصميم الأزرار الصغيرة */
+.btn-action {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-action:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.btn-action-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.btn-edit:hover {
+    background: linear-gradient(135deg, #2980b9, #1c6ea4);
+}
+
+.btn-reset {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+.btn-reset:hover {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+}
+
+/* حالة الترخيص */
+.license-status {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* معلومات إضافية */
+.license-meta {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.license-meta span {
+    font-size: 0.8rem;
+    background: #f8f9fa;
+    padding: 2px 8px;
+    border-radius: 5px;
+    border: 1px solid #e9ecef;
+}
+
+/* زر التحديد */
+.select-checkbox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.select-mode .license-card {
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.select-mode .license-card.selected {
+    border-color: var(--primary-color);
+    background: #f0f8ff;
+}
+
+/* تحسينات للهواتف */
+@media (max-width: 768px) {
+    .license-card {
+        padding: 12px;
+    }
+    
+    .license-actions {
+        flex-direction: column;
+        gap: 3px;
+    }
+    
+    .btn-action {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .license-meta {
+        flex-wrap: wrap;
+    }
+}
+
+/* تأثيرات عند النقر */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.btn-action:active {
+    animation: pulse 0.2s;
+}
+
+/* تلميحات الأدوات */
+[data-bs-toggle="tooltip"] {
+    cursor: pointer;
+}
+
+/* ألوان الحالات */
+.bg-linked {
+    background-color: #17a2b8 !important;
+}
+
+.bg-unlinked {
+    background-color: #6c757d !important;
+}
+
+/* مساحة الأزرار الجانبية */
+.action-sidebar {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: none;
+}
+
+.action-sidebar.show {
+    display: block;
+}
