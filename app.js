@@ -679,7 +679,7 @@ function toggleHint() {
     
     if (hint.classList.contains('hint-hidden')) {
         hint.classList.remove('hint-hidden');
-        hint.textContent = '780431';
+        hint.textContent = 'فارح بوجهك';
         button.textContent = 'إخفاء';
     } else {
         hint.classList.add('hint-hidden');
